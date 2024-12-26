@@ -21,3 +21,6 @@ jobs:
       uses: rastogiji/grafana-autodoc@main
       with:
         dashboard: "test.json"
+    - name: Get MD file
+      run: |
+          cat test.md
