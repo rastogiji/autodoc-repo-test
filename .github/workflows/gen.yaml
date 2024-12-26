@@ -19,20 +19,21 @@ jobs:
         quotepath: false
     - name: Set output in the matrix format
       id: set-output
-      run: echo 'changed_files={"files":${{ steps.changed-files.outputs.all_changed_files }}}' >> $GITHUB_OUTPUT
+      run: |
+        JSON=$(echo '${{ steps.changed-files.outputs.all_changed_files }}' | jq -c '{files: .}')
+        echo "matrix=$JSON" >> $GITHUB_OUTPUT
 
   doc:
     runs-on: ubuntu-latest
     needs: get-changes
     strategy:
-      matrix:
-        file: ${{ fromJson(needs.get-changes.outputs.changed_files).files }}
+      matrix: ${{ fromJson(needs.get-changes.outputs.matrix }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Generate Documentation
       uses: rastogiji/grafana-autodoc@main
       with:
-        dashboard: ${{ matrix.file }}
+        dashboard: ${{ matrix.files }}
     - name: Get MD file
       run: cat test.md
