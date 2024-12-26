@@ -1,0 +1,23 @@
+name: Generate Docs
+on:
+  push:
+      branches:
+        - main
+jobs:
+  doc:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v44
+    - name: List all changed files
+      run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed"
+          done
+    - name: Generate Documentation
+      uses: rastogiji/grafana-autodoc@13ec135b244e0d4680482426bf7d10b283e07d58
+      with:
+        dashboard: "test.json"
