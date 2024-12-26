@@ -7,8 +7,6 @@ jobs:
   doc:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
     - name: Changed files
       id: changed-files
       uses: tj-actions/changed-files@v44
