@@ -18,6 +18,6 @@ jobs:
             echo "$file was changed"
           done
     - name: Generate Documentation
-      uses: rastogiji/grafana-autodoc@97bce8b39a3101c19d5fc15fce0612684f00a97a
+      uses: rastogiji/grafana-autodoc@main
       with:
         dashboard: "test.json"
