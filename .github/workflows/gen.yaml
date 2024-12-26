@@ -4,7 +4,7 @@ on:
     branches:
       - master
 jobs:
-  doc:
+  get-changes:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -12,12 +12,24 @@ jobs:
     - name: Changed files
       id: changed-files
       uses: tj-actions/changed-files@v44
-    - name: Generate Documentation for each file
-      run: |
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            echo $file > temp_dashboard.json
-            rastogiji/grafana-autodoc@main --dashboard temp_dashboard.json
-          done
-    - name: Get MD file
-      run: |
-          
+      with:
+        json: true
+        quotepath: false
+    - name: 'Set output in the matrix format'
+      id: set-output
+      run: echo "changed_files={\"files\":${{ steps.changed-files.outputs.all_changed_files }}}" >> "$GITHUB_OUTPUT"
+  doc:
+    runs-on: ubuntu-latest
+    if: ${{ needs.get-changes.outputs.changed_files != '' }}
+    needs:
+    - get-changes
+    strategy:
+      matrix: ${{fromJson(needs.get-changes.outputs.changed_files)}}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: generate doc
+      uses: rastogiji/grafana-autodoc@main
+      with:
+        dashboard: ${{ matrix.files }}
+    
