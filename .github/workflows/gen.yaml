@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - '**/*.json'
 jobs:
   get-changes:
     runs-on: ubuntu-latest
@@ -20,7 +22,6 @@ jobs:
       run: echo "changed_files={\"files\":${{ steps.changed-files.outputs.all_changed_files }}}" >> "$GITHUB_OUTPUT"
   doc:
     runs-on: ubuntu-latest
-    if: ${{ needs.get-changes.outputs.changed_files != '' }}
     needs:
     - get-changes
     strategy:
