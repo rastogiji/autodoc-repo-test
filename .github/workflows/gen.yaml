@@ -44,8 +44,4 @@ jobs:
           dashboard: ${{ matrix.file }}
       - name: Get MD file
         run: |
-          file=$(basename "${{ matrix.file }}" .json)
-          echo $file
-          mdfile="${file}.md"
-          echo $mdfile
-          cat mdfile
+          ls -la
