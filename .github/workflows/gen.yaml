@@ -41,6 +41,6 @@ jobs:
       - name: Generate Documentation
         uses: rastogiji/grafana-autodoc@main
         with:
-          dashboard: ${{ file }}
+          dashboard: ${{ matrix.file }}
       - name: Get MD file
         run: cat test.md
