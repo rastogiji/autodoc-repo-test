@@ -8,33 +8,35 @@ on:
 jobs:
   get-changes:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-output.outputs.matrix }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    - name: Changed files
-      id: changed-files
-      uses: tj-actions/changed-files@v44
-      with:
-        json: true
-        quotepath: false
-    - name: Set output in the matrix format
-      id: set-output
-      run: |
-        JSON=$(echo '${{ steps.changed-files.outputs.all_changed_files }}' | jq -c '{files: .}')
-        echo "matrix=$JSON" >> $GITHUB_OUTPUT
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          json: true
+          quotepath: false
+      - name: Set output in the matrix format
+        id: set-output
+        run: |
+          JSON=$(echo '${{ steps.changed-files.outputs.all_changed_files }}' | jq -c '{include: [{files: .}]}')
+          echo "matrix=$JSON" >> $GITHUB_ENV
 
   doc:
     runs-on: ubuntu-latest
     needs: get-changes
     strategy:
       matrix:
-        files: ${{ fromJson(needs.get-changes.outputs.matrix }}
+        include: ${{ fromJson(needs.get-changes.outputs.matrix) }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    - name: Generate Documentation
-      uses: rastogiji/grafana-autodoc@main
-      with:
-        dashboard: ${{ matrix.files }}
-    - name: Get MD file
-      run: cat test.md
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Generate Documentation
+        uses: rastogiji/grafana-autodoc@main
+        with:
+          dashboard: ${{ matrix.files }}
+      - name: Get MD file
+        run: cat test.md
