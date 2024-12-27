@@ -22,21 +22,25 @@ jobs:
       - name: Set output in the matrix format
         id: set-output
         run: |
-          JSON=$(echo '${{ steps.changed-files.outputs.all_changed_files }}' | jq -c '{include: [{files: .}]}')
-          echo "matrix=$JSON" >> $GITHUB_ENV
+          JSON=$(echo '${{ steps.changed-files.outputs.all_changed_files }}' | jq -c '{files: .}')
+          echo "matrix=$JSON" >> $GITHUB_OUTPUT
+          echo "$GITHUB_OUTPUT"
 
   doc:
     runs-on: ubuntu-latest
     needs: get-changes
     strategy:
       matrix:
-        include: ${{ fromJson(needs.get-changes.outputs.matrix) }}
+        file: ${{ fromJson(needs.get-changes.outputs.matrix).files }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Print Outputs
+        run: |
+          echo "$GITHUB_OUTPUT"
       - name: Generate Documentation
         uses: rastogiji/grafana-autodoc@main
         with:
-          dashboard: ${{ matrix.files }}
+          dashboard: ${{ file }}
       - name: Get MD file
         run: cat test.md
